@@ -28,7 +28,10 @@
             --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --gradient-success: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
             --gradient-warning: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            --gradient-logout: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); /* Warna baru untuk logout */
+            --gradient-info: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%); /* New gradient for info/status */
+            --gradient-delete: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); /* New gradient for delete */
+            --gradient-logout: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            --gradient-back: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
         }
 
         body {
@@ -36,16 +39,17 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: var(--dark-color);
-            display: flex; /* Menggunakan flexbox untuk mengatur layout utama */
+            display: flex;
             flex-direction: column;
         }
 
-        /* Container untuk Dashboard (akan disembunyikan saat belum login) */
-        #dashboard {
+        /* General Container Styling */
+        .container {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            flex: 1; /* Mengisi sisa ruang vertikal */
+            flex: 1;
+            width: 100%;
         }
 
         /* Header Styles */
@@ -123,8 +127,7 @@
             color: var(--warning-color);
         }
 
-        /* Tombol Logout di Header */
-        .logout-btn {
+        .logout-btn, .back-to-dashboard-btn {
             background: var(--gradient-logout);
             color: white;
             border: none;
@@ -138,8 +141,11 @@
             align-items: center;
             gap: 8px;
         }
+        .back-to-dashboard-btn {
+            background: var(--gradient-back);
+        }
 
-        .logout-btn:hover {
+        .logout-btn:hover, .back-to-dashboard-btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-medium);
         }
@@ -294,7 +300,7 @@
             transform: scale(1.05);
         }
 
-        /* Content Display Area */
+        /* Content Display Area (General styling, now used for detail pages) */
         .content-display {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -303,57 +309,102 @@
             box-shadow: var(--shadow-heavy);
             margin-top: 2rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
         .content-header {
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 2px solid var(--border-color);
         }
 
         .content-title {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: var(--dark-color);
+            flex-grow: 1;
         }
 
-        .refresh-btn {
-            background: var(--gradient-success);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+        .action-buttons-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .action-button {
+            padding: 8px 15px;
+            border-radius: 8px;
             font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-left: auto;
+            gap: 5px;
+            border: none;
+            color: white;
+            text-decoration: none; /* For potential links */
         }
 
-        .refresh-btn:hover {
-            transform: scale(1.05);
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
         }
 
-        .data-display {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 1.5rem;
-            border-radius: 12px;
-            font-family: 'Fira Code', 'Consolas', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
+        /* Specific button styles */
+        .btn-refresh { background: var(--gradient-success); }
+        .btn-update { background: var(--gradient-primary); }
+        .btn-status { background: var(--gradient-info); }
+        .btn-delete { background: var(--gradient-delete); }
+        .btn-warning { background: var(--gradient-warning); } /* For 'Kurangi' */
+
+
+        /* Table Styling */
+        .data-table-container {
             overflow-x: auto;
-            white-space: pre-wrap;
-            border: 1px solid #334155;
+            flex-grow: 1;
         }
 
-        .loading-display {
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .data-table tr:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .data-table td {
+            color: var(--dark-color);
+        }
+
+        .loading-display, .error-display {
             text-align: center;
             padding: 3rem;
             color: #6b7280;
@@ -439,6 +490,15 @@
                 font-size: 0.8rem;
                 padding: 6px 12px;
             }
+            .data-table th, .data-table td {
+                padding: 8px 10px;
+            }
+            .data-table {
+                font-size: 0.8rem;
+            }
+            .action-buttons-container {
+                flex-direction: column; /* Stack buttons vertically on small screens */
+            }
         }
 
         /* Additional Improvements */
@@ -499,18 +559,17 @@
 
         /* Login Page Styles */
         .login-container {
-            /* Dihapus display: none; agar default-nya flex */
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             flex: 1;
-            position: fixed; /* Menjadikan overlay penuh layar */
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1001; /* Pastikan di atas dashboard */
+            z-index: 1001;
         }
 
         .login-card {
@@ -594,10 +653,22 @@
             font-weight: 500;
             font-size: 0.9rem;
         }
+
+        /* Specific visibility for pages */
+        #dashboard-page,
+        #detail-rencana-page,
+        #detail-produksi-page,
+        #detail-bahanbaku-page,
+        #detail-produkjadi-page,
+        #detail-pengiriman-page,
+        #detail-penjualan-page,
+        #detail-kpi-page {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div id="dashboard" class="container" style="display: none;">
+    <div id="dashboard-page" class="container">
         <header class="header">
             <div class="nav-container">
                 <div class="logo">
@@ -628,7 +699,7 @@
             </div>
 
             <div class="modules-grid">
-                <div class="module-card tooltip" data-tooltip="Kelola rencana dan jadwal produksi" onclick="loadData('rencana')">
+                <div class="module-card tooltip" data-tooltip="Kelola rencana dan jadwal produksi" onclick="navigateToDetail('rencana')">
                     <div class="module-header">
                         <div class="module-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
                             <i class="fas fa-calendar-alt"></i>
@@ -649,7 +720,7 @@
                     </div>
                 </div>
 
-                <div class="module-card tooltip" data-tooltip="Monitor proses produksi aktual" onclick="loadData('produksi')">
+                <div class="module-card tooltip" data-tooltip="Monitor proses produksi aktual" onclick="navigateToDetail('produksi')">
                     <div class="module-header">
                         <div class="module-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
                             <i class="fas fa-cogs"></i>
@@ -670,7 +741,7 @@
                     </div>
                 </div>
 
-                <div class="module-card tooltip" data-tooltip="Kelola stok bahan mentah" onclick="loadData('bahanbaku')">
+                <div class="module-card tooltip" data-tooltip="Kelola stok bahan mentah" onclick="navigateToDetail('bahanbaku')">
                     <div class="module-header">
                         <div class="module-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                             <i class="fas fa-boxes"></i>
@@ -691,7 +762,7 @@
                     </div>
                 </div>
 
-                <div class="module-card tooltip" data-tooltip="Kelola inventori produk jadi" onclick="loadData('produkjadi')">
+                <div class="module-card tooltip" data-tooltip="Kelola inventori produk jadi" onclick="navigateToDetail('produkjadi')">
                     <div class="module-header">
                         <div class="module-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
                             <i class="fas fa-warehouse"></i>
@@ -712,7 +783,7 @@
                     </div>
                 </div>
 
-                <div class="module-card tooltip" data-tooltip="Tracking pengiriman produk" onclick="loadData('pengiriman')">
+                <div class="module-card tooltip" data-tooltip="Tracking pengiriman produk" onclick="navigateToDetail('pengiriman')">
                     <div class="module-header">
                         <div class="module-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
                             <i class="fas fa-shipping-fast"></i>
@@ -733,7 +804,7 @@
                     </div>
                 </div>
 
-                <div class="module-card tooltip" data-tooltip="Manajemen pelanggan dan penjualan" onclick="loadData('penjualan')">
+                <div class="module-card tooltip" data-tooltip="Manajemen pelanggan dan penjualan" onclick="navigateToDetail('penjualan')">
                     <div class="module-header">
                         <div class="module-icon" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
                             <i class="fas fa-chart-line"></i>
@@ -754,7 +825,7 @@
                     </div>
                 </div>
 
-                <div class="module-card tooltip" data-tooltip="Analytics dan pelaporan bisnis" onclick="loadData('kpi')">
+                <div class="module-card tooltip" data-tooltip="Analytics dan pelaporan bisnis" onclick="navigateToDetail('kpi')">
                     <div class="module-header">
                         <div class="module-icon" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
                             <i class="fas fa-chart-pie"></i>
@@ -775,26 +846,10 @@
                     </div>
                 </div>
             </div>
-
-            <div class="content-display" id="contentDisplay" style="display: none;">
-                <div class="content-header">
-                    <h2 class="content-title" id="contentTitle">Data Module</h2>
-                    <button class="refresh-btn" onclick="refreshCurrentData()">
-                        <i class="fas fa-sync-alt"></i>
-                        Refresh
-                    </button>
-                </div>
-                <div id="output">
-                    <div class="loading-display">
-                        <div class="loading-spinner"></div>
-                        <p>Pilih modul untuk menampilkan data</p>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 
-    <div id="loginPage" class="login-container">
+    <div id="loginPage" class="login-container" style="display: none;">
         <div class="login-card">
             <h2>Selamat Datang di SIMDB Enterprise</h2>
             <form id="loginForm">
@@ -814,87 +869,469 @@
         </div>
     </div>
 
-    <script>
+    <div id="detail-rencana-page" class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-industry"></i>
+                    <span>SIMDB Enterprise</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="back-to-dashboard-btn" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                    </button>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTimeDetailRencana"></span>
+                    </div>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot online"></div>
+                        <span>System Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="content-display fade-in">
+                <div class="content-header">
+                    <h2 class="content-title">Detail Perencanaan Produksi</h2>
+                    <div class="action-buttons-container">
+                        <button class="action-button btn-refresh" onclick="loadDetailData('rencana_get', 'rencana')">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="action-button btn-update" onclick="handleAction('rencana_update', 'rencana')">
+                            <i class="fas fa-edit"></i> Update
+                        </button>
+                        <button class="action-button btn-delete" onclick="handleAction('rencana_delete', 'rencana')">
+                            <i class="fas fa-trash-alt"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+                <div id="rencana-data-output" class="data-table-container">
+                    <div class="loading-display">
+                        <div class="loading-spinner"></div>
+                        <p>Mengambil data perencanaan produksi...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
+    <div id="detail-produksi-page" class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-industry"></i>
+                    <span>SIMDB Enterprise</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="back-to-dashboard-btn" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                    </button>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTimeDetailProduksi"></span>
+                    </div>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot online"></div>
+                        <span>System Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="content-display fade-in">
+                <div class="content-header">
+                    <h2 class="content-title">Detail Proses Produksi</h2>
+                    <div class="action-buttons-container">
+                        <button class="action-button btn-refresh" onclick="loadDetailData('produksi_get', 'produksi')">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="action-button btn-status" onclick="handleAction('produksi_status', 'produksi')">
+                            <i class="fas fa-info-circle"></i> Status
+                        </button>
+                        <button class="action-button btn-delete" onclick="handleAction('produksi_delete', 'produksi')">
+                            <i class="fas fa-trash-alt"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+                <div id="produksi-data-output" class="data-table-container">
+                    <div class="loading-display">
+                        <div class="loading-spinner"></div>
+                        <p>Mengambil data proses produksi...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="detail-bahanbaku-page" class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-industry"></i>
+                    <span>SIMDB Enterprise</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="back-to-dashboard-btn" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                    </button>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTimeDetailBahanBaku"></span>
+                    </div>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot online"></div>
+                        <span>System Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="content-display fade-in">
+                <div class="content-header">
+                    <h2 class="content-title">Detail Gudang Bahan Baku</h2>
+                    <div class="action-buttons-container">
+                        <button class="action-button btn-refresh" onclick="loadDetailData('bahanbaku_get', 'bahanbaku')">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="action-button btn-warning" onclick="handleAction('bahanbaku_kurangi', 'bahanbaku')">
+                            <i class="fas fa-minus-circle"></i> Kurangi Stok
+                        </button>
+                        <button class="action-button btn-delete" onclick="handleAction('bahanbaku_delete', 'bahanbaku')">
+                            <i class="fas fa-trash-alt"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+                <div id="bahanbaku-data-output" class="data-table-container">
+                    <div class="loading-display">
+                        <div class="loading-spinner"></div>
+                        <p>Mengambil data gudang bahan baku...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="detail-produkjadi-page" class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-industry"></i>
+                    <span>SIMDB Enterprise</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="back-to-dashboard-btn" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                    </button>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTimeDetailProdukJadi"></span>
+                    </div>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot online"></div>
+                        <span>System Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="content-display fade-in">
+                <div class="content-header">
+                    <h2 class="content-title">Detail Gudang Produk Jadi</h2>
+                    <div class="action-buttons-container">
+                        <button class="action-button btn-refresh" onclick="loadDetailData('produkjadi_get', 'produkjadi')">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="action-button btn-warning" onclick="handleAction('produkjadi_keluar', 'produkjadi')">
+                            <i class="fas fa-sign-out-alt"></i> Produk Keluar
+                        </button>
+                        <button class="action-button btn-delete" onclick="handleAction('produkjadi_delete', 'produkjadi')">
+                            <i class="fas fa-trash-alt"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+                <div id="produkjadi-data-output" class="data-table-container">
+                    <div class="loading-display">
+                        <div class="loading-spinner"></div>
+                        <p>Mengambil data gudang produk jadi...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="detail-pengiriman-page" class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-industry"></i>
+                    <span>SIMDB Enterprise</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="back-to-dashboard-btn" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                    </button>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTimeDetailPengiriman"></span>
+                    </div>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot online"></div>
+                        <span>System Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="content-display fade-in">
+                <div class="content-header">
+                    <h2 class="content-title">Detail Distribusi & Pengiriman</h2>
+                    <div class="action-buttons-container">
+                        <button class="action-button btn-refresh" onclick="loadDetailData('pengiriman_get', 'pengiriman')">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="action-button btn-status" onclick="handleAction('pengiriman_status', 'pengiriman')">
+                            <i class="fas fa-truck"></i> Update Status
+                        </button>
+                        <button class="action-button btn-delete" onclick="handleAction('pengiriman_delete', 'pengiriman')">
+                            <i class="fas fa-trash-alt"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+                <div id="pengiriman-data-output" class="data-table-container">
+                    <div class="loading-display">
+                        <div class="loading-spinner"></div>
+                        <p>Mengambil data distribusi & pengiriman...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="detail-penjualan-page" class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-industry"></i>
+                    <span>SIMDB Enterprise</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="back-to-dashboard-btn" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                    </button>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTimeDetailPenjualan"></span>
+                    </div>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot online"></div>
+                        <span>System Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="content-display fade-in">
+                <div class="content-header">
+                    <h2 class="content-title">Detail Penjualan & Pelanggan</h2>
+                    <div class="action-buttons-container">
+                        <button class="action-button btn-refresh" onclick="loadDetailData('penjualan_get', 'penjualan')">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="action-button btn-status" onclick="handleAction('penjualan_status', 'penjualan')">
+                            <i class="fas fa-chart-bar"></i> Update Status
+                        </button>
+                        <button class="action-button btn-delete" onclick="handleAction('penjualan_delete', 'penjualan')">
+                            <i class="fas fa-trash-alt"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+                <div id="penjualan-data-output" class="data-table-container">
+                    <div class="loading-display">
+                        <div class="loading-spinner"></div>
+                        <p>Mengambil data penjualan & pelanggan...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="detail-kpi-page" class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-industry"></i>
+                    <span>SIMDB Enterprise</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="back-to-dashboard-btn" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                    </button>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTimeDetailKPI"></span>
+                    </div>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot online"></div>
+                        <span>System Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="content-display fade-in">
+                <div class="content-header">
+                    <h2 class="content-title">Detail Laporan Bisnis & KPI</h2>
+                    <div class="action-buttons-container">
+                        <button class="action-button btn-refresh" onclick="loadDetailData('kpi_produksi', 'kpi')">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="action-button btn-info" onclick="loadDetailData('kpi_produksi', 'kpi')">
+                            <i class="fas fa-chart-pie"></i> KPI Produksi
+                        </button>
+                        <button class="action-button btn-info" onclick="loadDetailData('kpi_penjualan', 'kpi')">
+                            <i class="fas fa-chart-line"></i> KPI Penjualan
+                        </button>
+                        <button class="action-button btn-info" onclick="loadDetailData('kpi_distribusi', 'kpi')">
+                            <i class="fas fa-truck-loading"></i> KPI Distribusi
+                        </button>
+                    </div>
+                </div>
+                <div id="kpi-data-output" class="data-table-container">
+                    <div class="loading-display">
+                        <div class="loading-spinner"></div>
+                        <p>Mengambil data KPI...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    <script>
         // Configuration
         const API_URLS = {
-            // URL untuk API login Mahasiswa 2
-            // Ganti '192.168.1.9' dengan IP Address AKTUAL komputer Mahasiswa 2
-            // Ganti 'user_management_module' dengan nama "Quick App" yang Anda buat di Laragon
-            login: 'http://192.168.1.14/user_management_module/login.php', 
-            // URL untuk modul API lainnya (dari Mahasiswa 3-9)
-            rencana: 'http://192.168.1.7/manajemen_barang/perencanaan_produksi/public/index.php',
-            produksi: 'http://192.168.1.10/proses_produksi/public/produksi',
-            bahanbaku: 'http://192.168.1.10/gudang_bahan_baku/public/stok',
-            produkjadi: 'http://192.168.1.10/gudang_produk_jadi/public/produk',
-            pengiriman: 'http://192.168.1.10/distribusi_pengiriman/public/pengiriman',
-            penjualan: 'http://192.168.1.10/manajemen_pelanggan/public/penjualan',
-            kpi: 'http://192.168.1.10/laporan_kpi/public/kpi/produksi'
+            login: 'http://192.168.1.10/user_management_module/login.php', 
+            
+            // Perencanaan Produksi (Mahasiswa 3)
+            rencana_get: 'http://192.168.1.10/perencanaan_produksi/public/index.php?url=rencana',
+            rencana_update: 'http://192.168.1.10/perencanaan_produksi/public/index.php?url=rencana/update',
+            rencana_delete: 'http://192.168.1.10/perencanaan_produksi/public/index.php?url=rencana/hapus',
+
+            // Proses Produksi (Mahasiswa 4)
+            produksi_get: 'http://192.168.1.10/proses_produksi/public/index.php?url=produksi',
+            produksi_status: 'http://192.168.1.10/proses_produksi/public/index.php?url=produksi/status',
+            produksi_delete: 'http://192.168.1.10/proses_produksi/public/index.php?url=produksi/hapus',
+
+            // Gudang Bahan Baku (Mahasiswa 5)
+            bahanbaku_get: 'http://192.168.1.10/gudang_bahan_baku/public/index.php?url=stok',
+            bahanbaku_kurangi: 'http://192.168.1.10/gudang_bahan_baku/public/index.php?url=stok/kurangi',
+            bahanbaku_delete: 'http://192.168.1.10/gudang_bahan_baku/public/index.php?url=stok/hapus',
+            
+            // Gudang Produk Jadi (Mahasiswa 6)
+            produkjadi_get: 'http://192.168.1.10/gudang_produk_jadi/public/index.php?url=produk',
+            produkjadi_keluar: 'http://192.168.1.10/gudang_produk_jadi/public/index.php?url=produk/keluar',
+            produkjadi_delete: 'http://192.168.1.10/gudang_produk_jadi/public/index.php?url=produk/hapus',
+
+            // Distribusi & Pengiriman (Mahasiswa 7)
+            pengiriman_get: 'http://192.168.1.10/distribusi_pengiriman/public/index.php?url=pengiriman',
+            pengiriman_status: 'http://192.168.1.10/distribusi_pengiriman/public/index.php?url=pengiriman/status',
+            pengiriman_delete: 'http://192.168.1.10/distribusi_pengiriman/public/index.php?url=pengiriman/hapus',
+
+            // Manajemen Pelanggan & Penjualan (Mahasiswa 8)
+            penjualan_get: 'http://192.168.1.10/manajemen_pelanggan/public/index.php?url=penjualan',
+            penjualan_status: 'http://192.168.1.10/manajemen_pelanggan/public/index.php?url=penjualan/status',
+            penjualan_delete: 'http://192.168.1.10/manajemen_pelanggan/public/index.php?url=penjualan/hapus',
+
+            // Laporan Bisnis & KPI (Mahasiswa 9)
+            kpi_produksi: 'http://192.168.1.10/laporan_kpi/public/index.php?url=kpi/produksi',
+            kpi_penjualan: 'http://192.168.1.10/laporan_kpi/public/index.php?url=kpi/penjualan',
+            kpi_distribusi: 'http://192.168.1.10/laporan_kpi/public/index.php?url=kpi/distribusi'
         };
 
         const MODULE_TITLES = {
             rencana: 'Perencanaan Produksi',
+            rencana_get: 'Data Perencanaan Produksi',
+            rencana_update: 'Update Perencanaan Produksi',
+            rencana_delete: 'Hapus Perencanaan Produksi',
+
             produksi: 'Proses Produksi',
+            produksi_get: 'Data Proses Produksi',
+            produksi_status: 'Update Status Produksi',
+            produksi_delete: 'Hapus Proses Produksi',
+
             bahanbaku: 'Gudang Bahan Baku',
+            bahanbaku_get: 'Data Gudang Bahan Baku',
+            bahanbaku_kurangi: 'Kurangi Stok Bahan Baku',
+            bahanbaku_delete: 'Hapus Bahan Baku',
+            
             produkjadi: 'Gudang Produk Jadi',
+            produkjadi_get: 'Data Gudang Produk Jadi',
+            produkjadi_keluar: 'Produk Jadi Keluar',
+            produkjadi_delete: 'Hapus Produk Jadi',
+
             pengiriman: 'Distribusi & Pengiriman',
+            pengiriman_get: 'Data Distribusi & Pengiriman',
+            pengiriman_status: 'Update Status Pengiriman',
+            pengiriman_delete: 'Hapus Pengiriman',
+
             penjualan: 'Penjualan & Pelanggan',
-            kpi: 'Laporan Bisnis & KPI'
+            penjualan_get: 'Data Penjualan & Pelanggan',
+            penjualan_status: 'Update Status Penjualan',
+            penjualan_delete: 'Hapus Penjualan',
+
+            kpi: 'Laporan Bisnis & KPI', // Main KPI module title
+            kpi_produksi: 'Laporan KPI Produksi',
+            kpi_penjualan: 'Laporan KPI Penjualan',
+            kpi_distribusi: 'Laporan KPI Distribusi'
         };
 
-        let currentModule = null;
+        const DETAIL_PAGE_MAP = {
+            rencana: { pageId: 'detail-rencana-page', outputId: 'rencana-data-output', timeId: 'currentTimeDetailRencana' },
+            produksi: { pageId: 'detail-produksi-page', outputId: 'produksi-data-output', timeId: 'currentTimeDetailProduksi' },
+            bahanbaku: { pageId: 'detail-bahanbaku-page', outputId: 'bahanbaku-data-output', timeId: 'currentTimeDetailBahanBaku' },
+            produkjadi: { pageId: 'detail-produkjadi-page', outputId: 'produkjadi-data-output', timeId: 'currentTimeDetailProdukJadi' },
+            pengiriman: { pageId: 'detail-pengiriman-page', outputId: 'pengiriman-data-output', timeId: 'currentTimeDetailPengiriman' },
+            penjualan: { pageId: 'detail-penjualan-page', outputId: 'penjualan-data-output', timeId: 'currentTimeDetailPenjualan' },
+            kpi: { pageId: 'detail-kpi-page', outputId: 'kpi-data-output', timeId: 'currentTimeDetailKPI' }
+        };
+
+        let currentModuleKey = null;
         let notificationTimeout;
 
-        // Inisialisasi Aplikasi saat DOM selesai dimuat
         document.addEventListener('DOMContentLoaded', function() {
             updateTime();
-            setInterval(updateTime, 1000); // Perbarui waktu setiap detik
+            setInterval(updateTime, 1000);
 
-            // Tambahkan animasi pada kartu modul
             const cards = document.querySelectorAll('.module-card');
             cards.forEach((card, index) => {
                 card.style.animationDelay = `${index * 0.1}s`;
                 card.classList.add('fade-in');
             });
 
-            // Periksa status autentikasi saat halaman dimuat
-            // Ini akan menentukan apakah form login atau dashboard yang ditampilkan
             checkAuth();
-
-            // Event listener untuk form login
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', function(event) {
-                    event.preventDefault(); // Mencegah form submit default
-                    performLogin();
-                });
-            }
         });
 
-        // --- Authentication Functions ---
-
-        /**
-         * Memeriksa status autentikasi pengguna dari localStorage.
-         * Menampilkan dashboard jika sudah login, atau halaman login jika belum.
-         */
         function checkAuth() {
+            localStorage.setItem('isLoggedIn', 'true'); 
+            localStorage.setItem('userRole', 'admin'); 
+
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const loginPage = document.getElementById('loginPage');
-            const dashboard = document.getElementById('dashboard');
+            const dashboardPage = document.getElementById('dashboard-page');
 
             if (isLoggedIn === 'true') {
                 loginPage.style.display = 'none';
-                dashboard.style.display = 'flex';
+                dashboardPage.style.display = 'flex';
+                hideAllDetailPages();
             } else {
-                loginPage.style.display = 'flex'; // Pastikan login page selalu terlihat jika belum login
-                dashboard.style.display = 'none';
+                loginPage.style.display = 'flex';
+                dashboardPage.style.display = 'none';
+                hideAllDetailPages();
             }
         }
 
-        /**
-         * Mengirim kredensial login ke API Mahasiswa 2.
-         * Memperbarui UI berdasarkan respons dari API.
-         */
         async function performLogin() {
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
@@ -903,210 +1340,354 @@
             const username = usernameInput.value;
             const password = passwordInput.value;
 
-            loginMessage.style.display = 'none'; // Sembunyikan pesan error sebelumnya
+            loginMessage.style.display = 'none';
 
-            // Validasi input sisi klien (opsional tapi baik)
             if (!username || !password) {
                 loginMessage.textContent = 'Nama pengguna dan kata sandi tidak boleh kosong.';
                 loginMessage.style.display = 'block';
-                return; // Hentikan fungsi jika input kosong
+                return;
             }
 
             try {
                 const response = await fetch(API_URLS.login, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password }),
                 });
 
-                const data = await response.json(); // Menguraikan respons JSON
+                const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
-                    // Jika login berhasil
                     localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userRole', data.user.role); // Simpan role (akan selalu 'admin')
+                    localStorage.setItem('userRole', data.user.role);
                     showSuccessMessage('Login berhasil!');
-                    // Sembunyikan login page dan tampilkan dashboard
                     document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'flex';
+                    document.getElementById('dashboard-page').style.display = 'flex';
+                    hideAllDetailPages();
                 } else {
-                    // Jika login gagal (status API 'error' atau HTTP status bukan 200 OK)
-                    // Pesan kesalahan dari API akan ditampilkan jika ada, jika tidak, pesan default
                     loginMessage.textContent = data.message || 'Login gagal. Silakan coba lagi.';
                     loginMessage.style.display = 'block';
                     showErrorMessage(data.message || 'Login gagal.');
-                    localStorage.setItem('isLoggedIn', 'false'); // Pastikan status login diatur ke false
+                    localStorage.setItem('isLoggedIn', 'false');
                 }
             } catch (error) {
-                // Tangani error jaringan atau server tidak merespons
                 loginMessage.textContent = 'Terjadi kesalahan saat menghubungi server. Pastikan server modul login berjalan dan dapat diakses. Detail: ' + error.message;
                 loginMessage.style.display = 'block';
                 showErrorMessage('Kesalahan jaringan: ' + error.message);
-                localStorage.setItem('isLoggedIn', 'false'); // Pastikan status login diatur ke false
+                localStorage.setItem('isLoggedIn', 'false');
             }
         }
 
-        /**
-         * Melakukan proses logout.
-         * Menghapus status login dari localStorage dan kembali ke halaman login.
-         */
         function logout() {
-            localStorage.removeItem('isLoggedIn'); // Hapus status login
-            localStorage.removeItem('userRole'); // Hapus role pengguna
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userRole');
             showSuccessMessage('Anda telah berhasil keluar.');
-            currentModule = null; // Reset modul yang sedang dipilih
+            currentModuleKey = null;
 
-            // Sembunyikan area konten (jika sedang menampilkan data modul)
-            const contentDisplay = document.getElementById('contentDisplay');
-            if (contentDisplay) {
-                contentDisplay.style.display = 'none';
-            }
-            // Reset pesan di area output
-            const output = document.getElementById('output');
-            if (output) {
-                output.innerHTML = `
-                    <div class="loading-display">
-                        <div class="loading-spinner"></div>
-                        <p>Pilih modul untuk menampilkan data</p>
-                    </div>
-                `;
-            }
-            // Tampilkan kembali halaman login dan sembunyikan dashboard
-            document.getElementById('dashboard').style.display = 'none';
+            document.querySelectorAll('.data-table-container').forEach(el => el.innerHTML = `<div class="loading-display"><div class="loading-spinner"></div><p>Pilih modul untuk menampilkan data</p></div>`);
+            document.getElementById('dashboard-page').style.display = 'none';
+            hideAllDetailPages();
             document.getElementById('loginPage').style.display = 'flex';
         }
-
-        // --- Other Dashboard Functions (tidak ada perubahan dari sebelumnya) ---
 
         function updateTime() {
             const now = new Date();
             const timeString = now.toLocaleString('id-ID', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
             });
             const currentTimeElement = document.getElementById('currentTime');
             if (currentTimeElement) {
                 currentTimeElement.textContent = timeString;
             }
+            for (const key in DETAIL_PAGE_MAP) {
+                const timeElement = document.getElementById(DETAIL_PAGE_MAP[key].timeId);
+                if (timeElement) {
+                    timeElement.textContent = timeString;
+                }
+            }
         }
 
-        async function loadData(module) {
-            // Pastikan user sudah login sebelum memuat data modul
+        function hideAllPages() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboard-page').style.display = 'none';
+            hideAllDetailPages();
+        }
+
+        function hideAllDetailPages() {
+            for (const key in DETAIL_PAGE_MAP) {
+                document.getElementById(DETAIL_PAGE_MAP[key].pageId).style.display = 'none';
+            }
+        }
+
+        function showDashboard() {
+            hideAllDetailPages();
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboard-page').style.display = 'flex';
+            currentModuleKey = null;
+        }
+
+        function navigateToDetail(module) {
             if (localStorage.getItem('isLoggedIn') !== 'true') {
                 showErrorMessage('Anda harus login untuk mengakses modul ini.');
-                logout(); // Arahkan kembali ke halaman login
+                logout();
                 return;
             }
 
-            currentModule = module;
-            const contentDisplay = document.getElementById('contentDisplay');
-            const output = document.getElementById('output');
-            const title = document.getElementById('contentTitle');
+            currentModuleKey = module;
+            hideAllPages();
+            
+            const detailPageInfo = DETAIL_PAGE_MAP[module];
+            if (detailPageInfo) {
+                document.getElementById(detailPageInfo.pageId).style.display = 'flex';
+                document.getElementById(detailPageInfo.pageId).scrollIntoView({ behavior: 'smooth' });
+                // Default to the main 'get' endpoint for the detail page
+                loadDetailData(`${module}_get`, module);
+            } else {
+                showErrorMessage(`Detail page for module '${module}' not found.`);
+                showDashboard();
+            }
+        }
 
-            if (contentDisplay) {
-                contentDisplay.style.display = 'block';
-                contentDisplay.scrollIntoView({ behavior: 'smooth' });
+        async function loadDetailData(apiEndpointKey, moduleKey) {
+            const detailPageInfo = DETAIL_PAGE_MAP[moduleKey];
+            if (!detailPageInfo) {
+                displayError({ message: `Configuration missing for module: ${moduleKey}` }, document.createElement('div'));
+                return;
+            }
+            const outputContainer = document.getElementById(detailPageInfo.outputId);
+            
+            if (!outputContainer) {
+                console.error(`Output container with ID '${detailPageInfo.outputId}' not found.`);
+                return;
             }
 
-            if (title) {
-                title.textContent = MODULE_TITLES[module] || module;
-            }
-
-            showLoading();
+            showLoading(outputContainer);
             updateSystemStatus('loading');
 
             try {
-                const response = await fetch(API_URLS[module]);
+                const url = API_URLS[apiEndpointKey];
+                if (!url) {
+                    throw new Error(`API URL not defined for endpoint: ${apiEndpointKey}`);
+                }
+
+                const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 const data = await response.json();
-                displayData(data);
+                displayTableData(data, outputContainer);
                 updateSystemStatus('online');
-                showSuccessMessage(`Data ${MODULE_TITLES[module] || ''} berhasil dimuat`);
+                showSuccessMessage(`Data ${MODULE_TITLES[apiEndpointKey] || MODULE_TITLES[moduleKey] || ''} berhasil dimuat`);
             } catch (error) {
-                displayError(error);
+                displayError(error, outputContainer);
                 updateSystemStatus('online');
-                showErrorMessage(`Gagal memuat data ${MODULE_TITLES[module] || ''}: ${error.message}`);
+                showErrorMessage(`Gagal memuat data ${MODULE_TITLES[apiEndpointKey] || MODULE_TITLES[moduleKey] || ''}: ${error.message}`);
             }
         }
 
-        function showLoading() {
-            const output = document.getElementById('output');
-            if (output) {
-                output.innerHTML = `
-                    <div class="loading-display">
-                        <div class="loading-spinner"></div>
-                        <p>Mengambil data dari server...</p>
-                    </div>
-                `;
+        // New function to handle generic module actions (Update, Status, Delete, Kurangi, Keluar)
+        async function handleAction(actionKey, moduleKey) {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                showErrorMessage('Anda harus login untuk melakukan tindakan ini.');
+                logout();
+                return;
+            }
+
+            const url = API_URLS[actionKey];
+            if (!url) {
+                showErrorMessage(`Aksi API tidak didefinisikan untuk: ${actionKey}`);
+                return;
+            }
+
+            let method = 'POST'; // Default for updates and status changes
+            let bodyData = {};
+            let itemId = null; // To store the ID of the item to be acted upon
+
+            // Common prompt for ID
+            itemId = prompt(`Masukkan ID untuk ${MODULE_TITLES[actionKey] || actionKey}:`);
+            if (!itemId) {
+                showErrorMessage('Aksi dibatalkan. ID tidak boleh kosong.');
+                return;
+            }
+            bodyData.id = itemId; // Assuming all actions take an 'id' parameter
+
+            // Specific handling for different actions
+            switch (actionKey) {
+                case 'rencana_update':
+                    const newPlan = prompt('Masukkan data update (JSON, e.g., {"field":"value"}):');
+                    try {
+                        bodyData = { ...bodyData, ...JSON.parse(newPlan) };
+                    } catch (e) {
+                        showErrorMessage('Format JSON tidak valid.');
+                        return;
+                    }
+                    method = 'PUT'; // Typically PUT for full update, or PATCH for partial
+                    break;
+                case 'produksi_status':
+                case 'pengiriman_status':
+                case 'penjualan_status':
+                    const newStatus = prompt(`Masukkan status baru untuk ID ${itemId}:`);
+                    if (!newStatus) { showErrorMessage('Status tidak boleh kosong.'); return; }
+                    bodyData.status = newStatus;
+                    method = 'PUT'; // Or PATCH
+                    break;
+                case 'bahanbaku_kurangi':
+                case 'produkjadi_keluar':
+                    const quantity = prompt(`Masukkan jumlah yang akan dikurangi/dikeluarkan untuk ID ${itemId}:`);
+                    if (!quantity || isNaN(quantity) || parseInt(quantity) <= 0) {
+                        showErrorMessage('Jumlah harus angka positif.');
+                        return;
+                    }
+                    bodyData.quantity = parseInt(quantity);
+                    method = 'POST'; // Or PUT/PATCH depending on API design
+                    break;
+                case 'rencana_delete':
+                case 'produksi_delete':
+                case 'bahanbaku_delete':
+                case 'produkjadi_delete':
+                case 'pengiriman_delete':
+                case 'penjualan_delete':
+                    if (!confirm(`Anda yakin ingin menghapus item dengan ID ${itemId} dari ${MODULE_TITLES[moduleKey]}?`)) {
+                        showErrorMessage('Aksi hapus dibatalkan.');
+                        return;
+                    }
+                    method = 'DELETE';
+                    break;
+                default:
+                    showErrorMessage('Aksi tidak dikenal.');
+                    return;
+            }
+
+            showNotificationDebounced(`Melakukan aksi '${MODULE_TITLES[actionKey] || actionKey}'...`, 'loading');
+            updateSystemStatus('loading');
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: (method !== 'GET' && method !== 'DELETE') ? JSON.stringify(bodyData) : null, // No body for GET/DELETE
+                });
+
+                const data = await response.json(); // Assuming all API responses are JSON
+
+                if (response.ok) {
+                    showSuccessMessage(data.message || `${MODULE_TITLES[actionKey] || actionKey} berhasil.`);
+                    // Refresh the data display after a successful action
+                    loadDetailData(`${moduleKey}_get`, moduleKey);
+                } else {
+                    throw new Error(data.message || `API Error: HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showErrorMessage(`${MODULE_TITLES[actionKey] || actionKey} gagal: ${error.message}`);
+            } finally {
+                updateSystemStatus('online'); // Always set back to online
             }
         }
 
-        function displayData(data) {
-            const output = document.getElementById('output');
-            if (output) {
-                const formattedData = JSON.stringify(data, null, 2);
-                output.innerHTML = `<div class="data-display">${escapeHtml(formattedData)}</div>`;
-            }
+
+        function showLoading(outputElement) {
+            outputElement.innerHTML = `
+                <div class="loading-display">
+                    <div class="loading-spinner"></div>
+                    <p>Mengambil data dari server...</p>
+                </div>
+            `;
         }
 
-        function displayError(error) {
-            const output = document.getElementById('output');
-            if (output) {
-                output.innerHTML = `
-                    <div class="error-display">
-                        <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Data</h3>
-                        <p><strong>Error:</strong> ${error.message}</p>
-                        <p><strong>Module:</strong> ${MODULE_TITLES[currentModule] || 'Tidak diketahui'}</p>
-                        <p><strong>Time:</strong> ${new Date().toLocaleString('id-ID')}</p>
-                        <hr style="margin: 1rem 0; border: none; height: 1px; background: rgba(239, 68, 68, 0.3);">
-                        <p><small>Pastikan server modul sedang berjalan dan dapat diakses.</small></p>
-                    </div>
-                `;
+        function displayTableData(data, outputElement) {
+            if (!data || (Array.isArray(data) && data.length === 0)) {
+                outputElement.innerHTML = `<div class="loading-display"><p>Tidak ada data untuk ditampilkan.</p></div>`;
+                return;
             }
+
+            const dataArray = Array.isArray(data) ? data : [data];
+
+            const table = document.createElement('table');
+            table.classList.add('data-table');
+
+            const thead = table.createTHead();
+            const headerRow = thead.insertRow();
+            const allKeys = [...new Set(dataArray.flatMap(obj => Object.keys(obj)))];
+            allKeys.forEach(key => {
+                const th = document.createElement('th');
+                th.textContent = formatHeader(key);
+                headerRow.appendChild(th);
+            });
+
+            const tbody = table.createTBody();
+            dataArray.forEach(item => {
+                const row = tbody.insertRow();
+                allKeys.forEach(key => {
+                    const cell = row.insertCell();
+                    cell.textContent = item[key] !== undefined && item[key] !== null ? item[key] : '-';
+                });
+            });
+
+            outputElement.innerHTML = '';
+            outputElement.appendChild(table);
+        }
+
+        function formatHeader(key) {
+            return key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+        }
+
+        function displayError(error, outputElement) {
+            outputElement.innerHTML = `
+                <div class="error-display">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Error Loading Data</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>Module:</strong> ${MODULE_TITLES[currentModuleKey] || 'Tidak diketahui'}</p>
+                    <p><strong>Time:</strong> ${new Date().toLocaleString('id-ID')}</p>
+                    <hr style="margin: 1rem 0; border: none; height: 1px; background: rgba(239, 68, 68, 0.3);">
+                    <p><small>Pastikan server modul sedang berjalan dan dapat diakses.</small></p>
+                </div>
+            `;
         }
 
         function refreshCurrentData() {
-            if (currentModule) {
-                loadData(currentModule);
+            if (currentModuleKey) {
+                // For KPI, we need to know which KPI sub-report was last viewed.
+                // This simplified version will default to 'kpi_produksi' for KPI refresh.
+                // For a more robust solution, you'd need a state variable to track the active KPI type.
+                if (currentModuleKey === 'kpi') {
+                    loadDetailData('kpi_produksi', 'kpi'); // Default KPI refresh
+                } else {
+                    loadDetailData(`${currentModuleKey}_get`, currentModuleKey);
+                }
             } else {
                 showErrorMessage('Tidak ada modul yang dipilih untuk di-refresh.');
             }
         }
 
         function updateSystemStatus(status) {
-            const statusIndicator = document.querySelector('.status-indicator');
-            const statusDot = statusIndicator ? statusIndicator.querySelector('.status-dot') : null;
-            const statusText = statusIndicator ? statusIndicator.FquerySelector('span') : null;
+            const statusIndicators = document.querySelectorAll('.status-indicator');
+            statusIndicators.forEach(statusIndicator => {
+                const statusDot = statusIndicator.querySelector('.status-dot');
+                const statusText = statusIndicator.querySelector('span');
 
-            if (statusIndicator && statusDot && statusText) {
-                statusIndicator.className = 'status-indicator';
-                statusDot.className = 'status-dot';
+                if (statusDot && statusText) {
+                    statusIndicator.className = 'status-indicator';
+                    statusDot.className = 'status-dot';
 
-                switch (status) {
-                    case 'online':
-                        statusIndicator.classList.add('status-online');
-                        statusDot.classList.add('online');
-                        statusText.textContent = 'System Online';
-                        break;
-                    case 'loading':
-                        statusIndicator.classList.add('status-loading');
-                        statusDot.classList.add('online');
-                        statusText.textContent = 'Loading Data';
-                        break;
-                    default:
-                        statusIndicator.classList.add('status-online');
-                        statusDot.classList.add('online');
-                        statusText.textContent = 'System Online';
+                    switch (status) {
+                        case 'online':
+                            statusIndicator.classList.add('status-online');
+                            statusDot.classList.add('online');
+                            statusText.textContent = 'System Online';
+                            break;
+                        case 'loading':
+                            statusIndicator.classList.add('status-loading');
+                            statusDot.classList.add('online');
+                            statusText.textContent = 'Loading Data';
+                            break;
+                        default:
+                            statusIndicator.classList.add('status-online');
+                            statusDot.classList.add('online');
+                            statusText.textContent = 'System Online';
+                    }
                 }
-            }
+            });
         }
 
         function escapeHtml(text) {
@@ -1115,7 +1696,6 @@
             return div.innerHTML;
         }
 
-        // Debounce function to prevent rapid notification pop-ups
         function debounce(func, delay) {
             let timeout;
             return function(...args) {
@@ -1137,7 +1717,6 @@
                     <span>${message}</span>
                 </div>
             `;
-
             document.body.appendChild(notification);
 
             setTimeout(() => {
@@ -1148,7 +1727,7 @@
                 notification.style.transform = 'translateX(400px)';
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
-        }, 200); // 200ms debounce delay
+        }, 200);
 
         function showSuccessMessage(message) {
             showNotificationDebounced(message, 'success');
@@ -1158,51 +1737,40 @@
             showNotificationDebounced(message, 'error');
         }
 
-        // Add keyboard shortcuts
         document.addEventListener('keydown', (event) => {
-            // Prevent default action for keys used as shortcuts
-            // Hanya izinkan shortcut jika dashboard terlihat (sudah login)
-            if (document.getElementById('dashboard').style.display === 'flex') {
-                if (['r', 'R', 'p', 'P', 'o', 'O', 'b', 'B', 'j', 'J', 'k', 'K', 's', 'S', 'i', 'I', 'l', 'L'].includes(event.key)) {
-                    event.preventDefault();
-                }
+            if (document.getElementById('loginPage').style.display === 'none') {
+                event.preventDefault();
 
-                switch (event.key) {
+                switch (event.key.toLowerCase()) {
                     case 'r':
-                    case 'R':
                         refreshCurrentData();
                         break;
                     case 'p':
-                    case 'P':
-                        loadData('rencana');
+                        navigateToDetail('rencana');
                         break;
-                    case 'o': // 'o' for prOduksi
-                    case 'O':
-                        loadData('produksi');
+                    case 'o':
+                        navigateToDetail('produksi');
                         break;
-                    case 'b': // 'b' for bahan baku
-                    case 'B':
-                        loadData('bahanbaku');
+                    case 'b':
+                        navigateToDetail('bahanbaku');
                         break;
-                    case 'j': // 'j' for produk jadi
-                    case 'J':
-                        loadData('produkjadi');
+                    case 'j':
+                        navigateToDetail('produkjadi');
                         break;
-                    case 'k': // 'k' for pengiriman (kirim)
-                    case 'K':
-                        loadData('pengiriman');
+                    case 'k':
+                        navigateToDetail('pengiriman');
                         break;
-                    case 's': // 's' for penjualan (sales)
-                    case 'S':
-                        loadData('penjualan');
+                    case 's':
+                        navigateToDetail('penjualan');
                         break;
-                    case 'i': // 'i' for kpi (insight)
-                    case 'I':
-                        loadData('kpi');
+                    case 'i':
+                        navigateToDetail('kpi');
                         break;
                     case 'l':
-                    case 'L': // 'L' for Logout
                         logout();
+                        break;
+                    case 'escape':
+                        showDashboard();
                         break;
                     default:
                         break;
