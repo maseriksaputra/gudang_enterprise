@@ -363,6 +363,7 @@
         .btn-status { background: var(--gradient-info); }
         .btn-delete { background: var(--gradient-delete); }
         .btn-warning { background: var(--gradient-warning); } /* For 'Kurangi' */
+        .btn-add { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); } /* New button for Add */
 
 
         /* Table Styling */
@@ -426,7 +427,7 @@
             color: var(--danger-color);
             padding: 1.5rem;
             border-radius: 12px;
-            border-left: 4px solid var(--danger-color);
+            border-left: 44px solid var(--danger-color);
         }
 
         /* Animations */
@@ -662,8 +663,126 @@
         #detail-produkjadi-page,
         #detail-pengiriman-page,
         #detail-penjualan-page,
-        #detail-kpi-page {
+        #detail-kpi-page,
+        #detail-user-page { /* Added for User Management Page */
             display: none;
+        }
+
+        /* KPI Specific Styles */
+        .kpi-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem; /* Adjust margin-top to separate from buttons */
+        }
+
+        .kpi-card {
+            background: var(--light-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+            animation: fadeIn 0.5s ease-out; /* Add fade-in for individual cards */
+        }
+
+        .kpi-card h4 {
+            font-size: 1.1rem;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .kpi-value i {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+        }
+
+        .kpi-description {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .kpi-graph {
+            width: 100%;
+            height: 10px;
+            background-color: var(--border-color);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 0.75rem;
+        }
+
+        .kpi-bar {
+            height: 100%;
+            background: var(--gradient-success); /* Default green */
+            width: 0%; /* Will be set by JS */
+            transition: width 0.5s ease-out;
+            border-radius: 5px;
+        }
+
+        .kpi-bar.red {
+            background: var(--gradient-delete);
+        }
+
+        .kpi-bar.orange {
+            background: var(--gradient-warning);
+        }
+        /* Style for a simple line chart */
+        .kpi-line-chart {
+            width: 100%;
+            height: 150px; /* Fixed height for the chart */
+            background-color: var(--light-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            padding: 1rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-line-chart .line-chart-bar {
+            flex: 1;
+            background-color: var(--secondary-color);
+            margin: 0 2px;
+            transition: height 0.5s ease-out, background-color 0.3s ease;
+            position: relative;
+            bottom: 0;
+            border-radius: 3px 3px 0 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: white;
+            font-weight: bold;
+            padding-top: 5px;
+        }
+        .kpi-line-chart .line-chart-bar span {
+            position: absolute;
+            top: -1.2em;
+            color: var(--dark-color);
+            font-size: 0.8em;
+            text-align: center;
+        }
+        .kpi-line-chart .line-chart-label {
+            position: absolute;
+            bottom: -1.5em;
+            font-size: 0.7em;
+            color: #6b7280;
+            width: 100%;
+            text-align: center;
         }
     </style>
 </head>
@@ -699,6 +818,27 @@
             </div>
 
             <div class="modules-grid">
+                <div class="module-card tooltip" data-tooltip="Kelola akun pengguna sistem" onclick="navigateToDetail('user')">
+                    <div class="module-header">
+                        <div class="module-icon" style="background: linear-gradient(135deg, #4c51bf 0%, #667eea 100%);">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div class="module-info">
+                            <h3>Manajemen Pengguna</h3>
+                            <p>Tambah, edit, hapus akun</p>
+                        </div>
+                    </div>
+                    <div class="module-stats">
+                        <div class="module-status">
+                            <div class="status-dot online"></div>
+                            <span>Active</span>
+                        </div>
+                        <button class="module-action">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="module-card tooltip" data-tooltip="Kelola rencana dan jadwal produksi" onclick="navigateToDetail('rencana')">
                     <div class="module-header">
                         <div class="module-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
@@ -849,7 +989,7 @@
         </main>
     </div>
 
-    <div id="loginPage" class="login-container" style="display: none;">
+    <div id="loginPage" class="login-container" style="display: flex;">
         <div class="login-card">
             <h2>Selamat Datang di SIMDB Enterprise</h2>
             <form id="loginForm">
@@ -867,6 +1007,57 @@
                 <p id="loginMessage" class="login-message" style="display: none;"></p>
             </form>
         </div>
+    </div>
+
+    <div id="detail-user-page" class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-industry"></i>
+                    <span>SIMDB Enterprise</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="back-to-dashboard-btn" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+                    </button>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTimeDetailUser"></span>
+                    </div>
+                    <div class="status-indicator status-online">
+                        <div class="status-dot online"></div>
+                        <span>System Online</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="content-display fade-in">
+                <div class="content-header">
+                    <h2 class="content-title">Detail Manajemen Pengguna</h2>
+                    <div class="action-buttons-container">
+                        <button class="action-button btn-refresh" onclick="loadDetailData('user_get', 'user')">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="action-button btn-add" onclick="handleAction('user_add', 'user')">
+                            <i class="fas fa-user-plus"></i> Tambah Pengguna
+                        </button>
+                        <button class="action-button btn-update" onclick="handleAction('user_update', 'user')">
+                            <i class="fas fa-user-edit"></i> Edit Pengguna
+                        </button>
+                        <button class="action-button btn-delete" onclick="handleAction('user_delete', 'user')">
+                            <i class="fas fa-user-minus"></i> Hapus Pengguna
+                        </button>
+                    </div>
+                </div>
+                <div id="user-data-output" class="data-table-container">
+                    <div class="loading-display">
+                        <div class="loading-spinner"></div>
+                        <p>Mengambil data pengguna...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <div id="detail-rencana-page" class="container">
@@ -1184,16 +1375,16 @@
                 <div class="content-header">
                     <h2 class="content-title">Detail Laporan Bisnis & KPI</h2>
                     <div class="action-buttons-container">
-                        <button class="action-button btn-refresh" onclick="loadDetailData('kpi_produksi', 'kpi')">
-                            <i class="fas fa-sync-alt"></i> Refresh
+                        <button class="action-button btn-refresh" onclick="processAndDisplayKPI('all_kpis', 'Ringkasan KPI')">
+                            <i class="fas fa-sync-alt"></i> Refresh Semua KPI
                         </button>
-                        <button class="action-button btn-info" onclick="loadDetailData('kpi_produksi', 'kpi')">
+                        <button class="action-button btn-info" onclick="processAndDisplayKPI('produksi_get', 'KPI Produksi')">
                             <i class="fas fa-chart-pie"></i> KPI Produksi
                         </button>
-                        <button class="action-button btn-info" onclick="loadDetailData('kpi_penjualan', 'kpi')">
+                        <button class="action-button btn-info" onclick="processAndDisplayKPI('penjualan_get', 'KPI Penjualan')">
                             <i class="fas fa-chart-line"></i> KPI Penjualan
                         </button>
-                        <button class="action-button btn-info" onclick="loadDetailData('kpi_distribusi', 'kpi')">
+                        <button class="action-button btn-info" onclick="processAndDisplayKPI('pengiriman_get', 'KPI Distribusi')">
                             <i class="fas fa-truck-loading"></i> KPI Distribusi
                         </button>
                     </div>
@@ -1201,7 +1392,7 @@
                 <div id="kpi-data-output" class="data-table-container">
                     <div class="loading-display">
                         <div class="loading-spinner"></div>
-                        <p>Mengambil data KPI...</p>
+                        <p>Pilih jenis KPI untuk menampilkan laporan.</p>
                     </div>
                 </div>
             </div>
@@ -1212,45 +1403,58 @@
     <script>
         // Configuration
         const API_URLS = {
-            login: 'http://192.168.1.10/user_management_module/login.php', 
-            
+            login: 'http://192.168.1.36/user_management_module/login.php',
+            // User Management (Mahasiswa 2)
+            user_get: 'http://192.168.1.36/user_management_module/get_users.php',
+            user_add: 'http://192.168.1.36/user_management_module/add_user.php',
+            user_update: 'http://192.168.1.36/user_management_module/update_user.php',
+            user_delete: 'http://192.168.1.36/user_management_module/delete_user.php',
+
             // Perencanaan Produksi (Mahasiswa 3)
-            rencana_get: 'http://192.168.1.10/perencanaan_produksi/public/index.php?url=rencana',
-            rencana_update: 'http://192.168.1.10/perencanaan_produksi/public/index.php?url=rencana/update',
-            rencana_delete: 'http://192.168.1.10/perencanaan_produksi/public/index.php?url=rencana/hapus',
+            rencana_get: 'http://192.168.1.36/perencanaan_produksi/public/index.php?url=rencana',
+            rencana_update: 'http://192.168.1.36/perencanaan_produksi/public/index.php?url=rencana/update',
+            rencana_delete: 'http://192.168.1.36/perencanaan_produksi/public/index.php?url=rencana/hapus',
 
             // Proses Produksi (Mahasiswa 4)
-            produksi_get: 'http://192.168.1.10/proses_produksi/public/index.php?url=produksi',
-            produksi_status: 'http://192.168.1.10/proses_produksi/public/index.php?url=produksi/status',
-            produksi_delete: 'http://192.168.1.10/proses_produksi/public/index.php?url=produksi/hapus',
+            produksi_get: 'http://192.168.1.36/proses_produksi/public/index.php?url=produksi',
+            produksi_status: 'http://192.168.1.36/proses_produksi/public/index.php?url=produksi/status',
+            produksi_delete: 'http://192.168.1.36/proses_produksi/public/index.php?url=produksi/hapus',
 
             // Gudang Bahan Baku (Mahasiswa 5)
-            bahanbaku_get: 'http://192.168.1.10/gudang_bahan_baku/public/index.php?url=stok',
-            bahanbaku_kurangi: 'http://192.168.1.10/gudang_bahan_baku/public/index.php?url=stok/kurangi',
-            bahanbaku_delete: 'http://192.168.1.10/gudang_bahan_baku/public/index.php?url=stok/hapus',
+            bahanbaku_get: 'http://192.168.1.36/gudang_bahan_baku/public/index.php?url=stok',
+            bahanbaku_kurangi: 'http://192.168.1.36/gudang_bahan_baku/public/index.php?url=stok/kurangi',
+            bahanbaku_delete: 'http://192.168.1.36/gudang_bahan_baku/public/index.php?url=stok/hapus',
             
             // Gudang Produk Jadi (Mahasiswa 6)
-            produkjadi_get: 'http://192.168.1.10/gudang_produk_jadi/public/index.php?url=produk',
-            produkjadi_keluar: 'http://192.168.1.10/gudang_produk_jadi/public/index.php?url=produk/keluar',
-            produkjadi_delete: 'http://192.168.1.10/gudang_produk_jadi/public/index.php?url=produk/hapus',
+            produkjadi_get: 'http://192.168.1.36/gudang_produk_jadi/public/index.php?url=produk',
+            produkjadi_keluar: 'http://192.168.1.36/gudang_produk_jadi/public/index.php?url=produk/keluar',
+            produkjadi_delete: 'http://192.168.1.36/gudang_produk_jadi/public/index.php?url=produk/hapus',
 
             // Distribusi & Pengiriman (Mahasiswa 7)
-            pengiriman_get: 'http://192.168.1.10/distribusi_pengiriman/public/index.php?url=pengiriman',
-            pengiriman_status: 'http://192.168.1.10/distribusi_pengiriman/public/index.php?url=pengiriman/status',
-            pengiriman_delete: 'http://192.168.1.10/distribusi_pengiriman/public/index.php?url=pengiriman/hapus',
+            pengiriman_get: 'http://192.168.1.36/distribusi_pengiriman/public/index.php?url=pengiriman',
+            pengiriman_status: 'http://192.168.1.36/distribusi_pengiriman/public/index.php?url=pengiriman/status',
+            pengiriman_delete: 'http://192.168.1.36/distribusi_pengiriman/public/index.php?url=pengiriman/hapus',
 
             // Manajemen Pelanggan & Penjualan (Mahasiswa 8)
-            penjualan_get: 'http://192.168.1.10/manajemen_pelanggan/public/index.php?url=penjualan',
-            penjualan_status: 'http://192.168.1.10/manajemen_pelanggan/public/index.php?url=penjualan/status',
-            penjualan_delete: 'http://192.168.1.10/manajemen_pelanggan/public/index.php?url=penjualan/hapus',
+            penjualan_get: 'http://192.168.1.36/manajemen_pelanggan/public/index.php?url=penjualan',
+            penjualan_status: 'http://192.168.1.36/manajemen_pelanggan/public/index.php?url=penjualan/status',
+            penjualan_delete: 'http://192.168.1.36/manajemen_pelanggan/public/index.php?url=penjualan/hapus',
 
-            // Laporan Bisnis & KPI (Mahasiswa 9)
-            kpi_produksi: 'http://192.168.1.10/laporan_kpi/public/index.php?url=kpi/produksi',
-            kpi_penjualan: 'http://192.168.1.10/laporan_kpi/public/index.php?url=kpi/penjualan',
-            kpi_distribusi: 'http://192.168.1.10/laporan_kpi/public/index.php?url=kpi/distribusi'
+            // Laporan Bisnis & KPI (Mahasiswa 9) - Now directly fetched data from respective modules
+            // These keys map to the _get endpoints of relevant modules for raw data
+            // Note: These should correspond to the actual data fetching URLs of each module.
+            kpi_produksi_data: 'produksi_get', // Uses production module's get endpoint for raw data
+            kpi_penjualan_data: 'penjualan_get', // Uses sales module's get endpoint for raw data
+            kpi_distribusi_data: 'pengiriman_get' // Uses delivery module's get endpoint for raw data
         };
 
         const MODULE_TITLES = {
+            user: 'Manajemen Pengguna', // New
+            user_get: 'Data Pengguna',
+            user_add: 'Tambah Pengguna',
+            user_update: 'Edit Pengguna',
+            user_delete: 'Hapus Pengguna',
+
             rencana: 'Perencanaan Produksi',
             rencana_get: 'Data Perencanaan Produksi',
             rencana_update: 'Update Perencanaan Produksi',
@@ -1282,12 +1486,14 @@
             penjualan_delete: 'Hapus Penjualan',
 
             kpi: 'Laporan Bisnis & KPI', // Main KPI module title
-            kpi_produksi: 'Laporan KPI Produksi',
-            kpi_penjualan: 'Laporan KPI Penjualan',
-            kpi_distribusi: 'Laporan KPI Distribusi'
+            kpi_produksi_data: 'Laporan KPI Produksi',
+            kpi_penjualan_data: 'Laporan KPI Penjualan',
+            kpi_distribusi_data: 'Laporan KPI Distribusi',
+            all_kpis: 'Ringkasan KPI' // For the general KPI refresh
         };
 
         const DETAIL_PAGE_MAP = {
+            user: { pageId: 'detail-user-page', outputId: 'user-data-output', timeId: 'currentTimeDetailUser' }, // New
             rencana: { pageId: 'detail-rencana-page', outputId: 'rencana-data-output', timeId: 'currentTimeDetailRencana' },
             produksi: { pageId: 'detail-produksi-page', outputId: 'produksi-data-output', timeId: 'currentTimeDetailProduksi' },
             bahanbaku: { pageId: 'detail-bahanbaku-page', outputId: 'bahanbaku-data-output', timeId: 'currentTimeDetailBahanBaku' },
@@ -1298,6 +1504,7 @@
         };
 
         let currentModuleKey = null;
+        let currentKpiSourceKey = null; // Stores the API_URLS key (e.g., 'produksi_get') for the last loaded KPI report
         let notificationTimeout;
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1310,13 +1517,16 @@
                 card.classList.add('fade-in');
             });
 
-            checkAuth();
+            checkAuth(); // Call checkAuth on page load
+
+            // Handle login form submission
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                performLogin();
+            });
         });
 
         function checkAuth() {
-            localStorage.setItem('isLoggedIn', 'true'); 
-            localStorage.setItem('userRole', 'admin'); 
-
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const loginPage = document.getElementById('loginPage');
             const dashboardPage = document.getElementById('dashboard-page');
@@ -1326,7 +1536,7 @@
                 dashboardPage.style.display = 'flex';
                 hideAllDetailPages();
             } else {
-                loginPage.style.display = 'flex';
+                loginPage.style.display = 'flex'; // Ensure login page is visible if not logged in
                 dashboardPage.style.display = 'none';
                 hideAllDetailPages();
             }
@@ -1359,7 +1569,7 @@
 
                 if (response.ok && data.status === 'success') {
                     localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userRole', data.user.role);
+                    localStorage.setItem('userRole', data.user.role); // Store user role if available
                     showSuccessMessage('Login berhasil!');
                     document.getElementById('loginPage').style.display = 'none';
                     document.getElementById('dashboard-page').style.display = 'flex';
@@ -1383,11 +1593,14 @@
             localStorage.removeItem('userRole');
             showSuccessMessage('Anda telah berhasil keluar.');
             currentModuleKey = null;
+            currentKpiSourceKey = null; // Reset KPI source on logout
 
+            // Clear all data outputs to ensure a clean state upon re-login
             document.querySelectorAll('.data-table-container').forEach(el => el.innerHTML = `<div class="loading-display"><div class="loading-spinner"></div><p>Pilih modul untuk menampilkan data</p></div>`);
+            
             document.getElementById('dashboard-page').style.display = 'none';
             hideAllDetailPages();
-            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('loginPage').style.display = 'flex'; // Show login page
         }
 
         function updateTime() {
@@ -1425,6 +1638,7 @@
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dashboard-page').style.display = 'flex';
             currentModuleKey = null;
+            currentKpiSourceKey = null; // Reset KPI source on dashboard return
         }
 
         function navigateToDetail(module) {
@@ -1441,8 +1655,15 @@
             if (detailPageInfo) {
                 document.getElementById(detailPageInfo.pageId).style.display = 'flex';
                 document.getElementById(detailPageInfo.pageId).scrollIntoView({ behavior: 'smooth' });
-                // Default to the main 'get' endpoint for the detail page
-                loadDetailData(`${module}_get`, module);
+
+                if (module === 'kpi') {
+                    const outputContainer = document.getElementById(detailPageInfo.outputId);
+                    outputContainer.innerHTML = `<div class="loading-display"><div class="loading-spinner"></div><p>Pilih jenis KPI untuk menampilkan laporan.</p></div>`;
+                    currentKpiSourceKey = null; // Reset for KPI page
+                    processAndDisplayKPI('all_kpis', 'Ringkasan KPI'); // Load overall KPI on entering page
+                } else {
+                    loadDetailData(`${module}_get`, module);
+                }
             } else {
                 showErrorMessage(`Detail page for module '${module}' not found.`);
                 showDashboard();
@@ -1473,7 +1694,14 @@
 
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    let errorBody = await response.text();
+                    try {
+                        const errorJson = JSON.parse(errorBody);
+                        errorBody = errorJson.message || errorJson.error || errorBody;
+                    } catch (e) {
+                        // Not a JSON error, use plain text
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}. Detail: ${errorBody}`);
                 }
                 const data = await response.json();
                 displayTableData(data, outputContainer);
@@ -1486,103 +1714,295 @@
             }
         }
 
-        // New function to handle generic module actions (Update, Status, Delete, Kurangi, Keluar)
-        async function handleAction(actionKey, moduleKey) {
-            if (localStorage.getItem('isLoggedIn') !== 'true') {
-                showErrorMessage('Anda harus login untuk melakukan tindakan ini.');
-                logout();
-                return;
-            }
-
-            const url = API_URLS[actionKey];
-            if (!url) {
-                showErrorMessage(`Aksi API tidak didefinisikan untuk: ${actionKey}`);
-                return;
-            }
-
-            let method = 'POST'; // Default for updates and status changes
-            let bodyData = {};
-            let itemId = null; // To store the ID of the item to be acted upon
-
-            // Common prompt for ID
-            itemId = prompt(`Masukkan ID untuk ${MODULE_TITLES[actionKey] || actionKey}:`);
-            if (!itemId) {
-                showErrorMessage('Aksi dibatalkan. ID tidak boleh kosong.');
-                return;
-            }
-            bodyData.id = itemId; // Assuming all actions take an 'id' parameter
-
-            // Specific handling for different actions
-            switch (actionKey) {
-                case 'rencana_update':
-                    const newPlan = prompt('Masukkan data update (JSON, e.g., {"field":"value"}):');
-                    try {
-                        bodyData = { ...bodyData, ...JSON.parse(newPlan) };
-                    } catch (e) {
-                        showErrorMessage('Format JSON tidak valid.');
-                        return;
-                    }
-                    method = 'PUT'; // Typically PUT for full update, or PATCH for partial
-                    break;
-                case 'produksi_status':
-                case 'pengiriman_status':
-                case 'penjualan_status':
-                    const newStatus = prompt(`Masukkan status baru untuk ID ${itemId}:`);
-                    if (!newStatus) { showErrorMessage('Status tidak boleh kosong.'); return; }
-                    bodyData.status = newStatus;
-                    method = 'PUT'; // Or PATCH
-                    break;
-                case 'bahanbaku_kurangi':
-                case 'produkjadi_keluar':
-                    const quantity = prompt(`Masukkan jumlah yang akan dikurangi/dikeluarkan untuk ID ${itemId}:`);
-                    if (!quantity || isNaN(quantity) || parseInt(quantity) <= 0) {
-                        showErrorMessage('Jumlah harus angka positif.');
-                        return;
-                    }
-                    bodyData.quantity = parseInt(quantity);
-                    method = 'POST'; // Or PUT/PATCH depending on API design
-                    break;
-                case 'rencana_delete':
-                case 'produksi_delete':
-                case 'bahanbaku_delete':
-                case 'produkjadi_delete':
-                case 'pengiriman_delete':
-                case 'penjualan_delete':
-                    if (!confirm(`Anda yakin ingin menghapus item dengan ID ${itemId} dari ${MODULE_TITLES[moduleKey]}?`)) {
-                        showErrorMessage('Aksi hapus dibatalkan.');
-                        return;
-                    }
-                    method = 'DELETE';
-                    break;
-                default:
-                    showErrorMessage('Aksi tidak dikenal.');
-                    return;
-            }
-
-            showNotificationDebounced(`Melakukan aksi '${MODULE_TITLES[actionKey] || actionKey}'...`, 'loading');
+        /**
+         * Processes raw data from module APIs and displays relevant KPI metrics and a simple chart.
+         * @param {string} sourceKey The key from API_URLS (e.g., 'produksi_get') or 'all_kpis'.
+         * @param {string} displayTitle The title for the KPI report (e.g., 'KPI Produksi').
+         */
+        async function processAndDisplayKPI(sourceKey, displayTitle) {
+            const outputContainer = document.getElementById(DETAIL_PAGE_MAP.kpi.outputId);
+            showLoading(outputContainer);
             updateSystemStatus('loading');
 
+            let allKpiData = {
+                produksi: [],
+                penjualan: [],
+                pengiriman: []
+            };
+
             try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: (method !== 'GET' && method !== 'DELETE') ? JSON.stringify(bodyData) : null, // No body for GET/DELETE
-                });
+                if (sourceKey === 'all_kpis') {
+                    currentKpiSourceKey = 'all_kpis';
+                    const [produksiRes, penjualanRes, pengirimanRes] = await Promise.allSettled([
+                        fetch(API_URLS.produksi_get),
+                        fetch(API_URLS.penjualan_get),
+                        fetch(API_URLS.pengiriman_get)
+                    ]);
 
-                const data = await response.json(); // Assuming all API responses are JSON
+                    if (produksiRes.status === 'fulfilled' && produksiRes.value.ok) {
+                        allKpiData.produksi = Array.isArray(await produksiRes.value.json()) ? await produksiRes.value.json() : [];
+                    } else {
+                        console.error("Gagal memuat data produksi untuk KPI:", produksiRes.reason || (produksiRes.value ? await produksiRes.value.text() : ''));
+                        showErrorMessage("Gagal memuat data produksi untuk KPI.");
+                    }
+                    if (penjualanRes.status === 'fulfilled' && penjualanRes.value.ok) {
+                        allKpiData.penjualan = Array.isArray(await penjualanRes.value.json()) ? await penjualanRes.value.json() : [];
+                    } else {
+                        console.error("Gagal memuat data penjualan untuk KPI:", penjualanRes.reason || (penjualanRes.value ? await penjualanRes.value.text() : ''));
+                        showErrorMessage("Gagal memuat data penjualan untuk KPI.");
+                    }
+                    if (pengirimanRes.status === 'fulfilled' && pengirimanRes.value.ok) {
+                        allKpiData.pengiriman = Array.isArray(await pengirimanRes.value.json()) ? await pengirimanRes.value.json() : [];
+                    } else {
+                        console.error("Gagal memuat data pengiriman untuk KPI:", pengirimanRes.reason || (pengirimanRes.value ? await pengirimanRes.value.text() : ''));
+                        showErrorMessage("Gagal memuat data pengiriman untuk KPI.");
+                    }
+                    displayOverallKPISummary(allKpiData, outputContainer);
 
-                if (response.ok) {
-                    showSuccessMessage(data.message || `${MODULE_TITLES[actionKey] || actionKey} berhasil.`);
-                    // Refresh the data display after a successful action
-                    loadDetailData(`${moduleKey}_get`, moduleKey);
                 } else {
-                    throw new Error(data.message || `API Error: HTTP ${response.status}`);
+                    currentKpiSourceKey = sourceKey;
+                    const urlToFetch = API_URLS[sourceKey];
+                    const response = await fetch(urlToFetch);
+                    if (!response.ok) {
+                        let errorBody = await response.text();
+                        try {
+                            const errorJson = JSON.parse(errorBody);
+                            errorBody = errorJson.message || errorJson.error || errorBody;
+                        } catch (e) { /* Not JSON */ }
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}. Detail: ${errorBody}`);
+                    }
+                    const rawData = await response.json();
+                    const processedData = Array.isArray(rawData) ? rawData : (rawData ? [rawData] : []);
+
+                    displaySpecificKPIReport(processedData, outputContainer, displayTitle, sourceKey);
                 }
+                updateSystemStatus('online');
+                showSuccessMessage(`Laporan ${displayTitle} berhasil dimuat.`);
+
             } catch (error) {
-                showErrorMessage(`${MODULE_TITLES[actionKey] || actionKey} gagal: ${error.message}`);
-            } finally {
-                updateSystemStatus('online'); // Always set back to online
+                displayError(error, outputContainer);
+                updateSystemStatus('online');
+                showErrorMessage(`Gagal memuat laporan ${displayTitle}: ${error.message}`);
             }
+        }
+
+        /**
+         * Displays the overall KPI summary from all modules.
+         * @param {object} kpiData Object containing arrays of raw data for produksi, penjualan, pengiriman.
+         * @param {HTMLElement} outputElement The container to display the KPI cards and charts.
+         */
+        function displayOverallKPISummary(kpiData, outputElement) {
+            let htmlContent = '<h3>Ringkasan Kinerja Bisnis</h3><div class="kpi-metrics-grid">';
+            let productionTrend = [];
+            let salesTrend = [];
+            let deliveryTrend = [];
+
+            // Production KPIs
+            const totalUnits = (kpiData.produksi || []).reduce((sum, item) => sum + (parseInt(item.jumlah_unit) || 0), 0);
+            const completedProductions = (kpiData.produksi || []).filter(item => item.status_produksi === 'Selesai').length;
+            const inProgressProductions = (kpiData.produksi || []).filter(item => item.status_produksi === 'Dalam Proses').length;
+            
+            htmlContent += renderKPICard('Total Unit Produksi', totalUnits, 'Unit berhasil diproduksi.', 'fas fa-factory', '', 1500);
+            htmlContent += renderKPICard('Produksi Selesai', completedProductions, 'Proses produksi selesai.', 'fas fa-check-circle', '', (kpiData.produksi || []).length);
+            // Dummy data for production trend (replace with actual historical data if available)
+            productionTrend = [
+                { label: 'Jan', value: 800 }, { label: 'Feb', value: 950 }, { label: 'Mar', value: 1100 },
+                { label: 'Apr', value: 900 }, { label: 'Mei', value: 1200 }, { label: 'Jun', value: totalUnits }
+            ];
+
+            // Sales KPIs
+            const totalRevenue = (kpiData.penjualan || []).reduce((sum, item) => sum + (parseFloat(item.total_harga) || 0), 0);
+            const totalOrders = (kpiData.penjualan || []).length;
+            const completedOrders = (kpiData.penjualan || []).filter(item => item.status_pesanan === 'Selesai').length;
+            
+            htmlContent += renderKPICard('Total Pendapatan', `Rp ${totalRevenue.toLocaleString('id-ID')}`, 'Total penjualan bersih.', 'fas fa-money-bill-wave', '', 50000000);
+            htmlContent += renderKPICard('Pesanan Selesai', completedOrders, 'Jumlah pesanan yang sudah dibayar.', 'fas fa-shopping-cart', '', totalOrders);
+             // Dummy data for sales trend (replace with actual historical data if available)
+            salesTrend = [
+                { label: 'Jan', value: 20000000 }, { label: 'Feb', value: 25000000 }, { label: 'Mar', value: 30000000 },
+                { label: 'Apr', value: 22000000 }, { label: 'Mei', value: 35000000 }, { label: 'Jun', value: totalRevenue }
+            ];
+
+            // Distribution KPIs
+            const totalDeliveries = (kpiData.pengiriman || []).length;
+            const deliveredSuccess = (kpiData.pengiriman || []).filter(item => item.status_pengiriman === 'Terkirim').length;
+            const deliveredFailed = (kpiData.pengiriman || []).filter(item => item.status_pengiriman === 'Gagal').length;
+            const avgDeliveryTime = calculateAvgDeliveryTime(kpiData.pengiriman || []);
+
+            htmlContent += renderKPICard('Pengiriman Berhasil', deliveredSuccess, 'Jumlah pengiriman sukses.', 'fas fa-truck', '', totalDeliveries);
+            htmlContent += renderKPICard('Pengiriman Gagal', deliveredFailed, 'Jumlah pengiriman yang gagal.', 'fas fa-exclamation-triangle', 'red', totalDeliveries);
+            htmlContent += renderKPICard('Rata-rata Waktu Kirim', `${avgDeliveryTime} hari`, 'Estimasi rata-rata waktu pengiriman.', 'fas fa-clock', '', 7);
+            // Dummy data for delivery success rate trend (replace with actual historical data if available)
+            deliveryTrend = [
+                { label: 'Jan', value: 90 }, { label: 'Feb', value: 92 }, { label: 'Mar', value: 88 },
+                { label: 'Apr', value: 95 }, { label: 'Mei', value: 91 }, { label: 'Jun', value: (deliveredSuccess / totalDeliveries * 100) || 0 }
+            ];
+
+            htmlContent += '</div>'; // close kpi-metrics-grid
+
+            // Add combined charts for overall view
+            htmlContent += renderLineChart(productionTrend, 'Tren Produksi Bulanan (Unit)');
+            htmlContent += renderLineChart(salesTrend, 'Tren Penjualan Bulanan (Rp)');
+            htmlContent += renderLineChart(deliveryTrend, 'Persentase Pengiriman Berhasil (%)');
+
+            outputElement.innerHTML = htmlContent;
+        }
+
+        /**
+         * Displays a specific KPI report with its metrics and chart.
+         * @param {Array} processedData The raw data array for the specific module.
+         * @param {HTMLElement} outputElement The container to display the KPI report.
+         * @param {string} displayTitle The title for this specific KPI report.
+         * @param {string} sourceKey The API source key (e.g., 'produksi_get').
+         */
+        function displaySpecificKPIReport(processedData, outputElement, displayTitle, sourceKey) {
+            let kpiMetricsHtml = `<h3>${displayTitle}</h3><div class="kpi-metrics-grid">`;
+            let chartHtml = '';
+            let hasData = processedData.length > 0;
+
+            if (sourceKey === 'produksi_get') {
+                const totalUnits = processedData.reduce((sum, item) => sum + (parseInt(item.jumlah_unit) || 0), 0);
+                const completedProductions = processedData.filter(item => item.status_produksi === 'Selesai').length;
+                const inProgressProductions = processedData.filter(item => item.status_produksi === 'Dalam Proses').length;
+
+                const productionTrend = [
+                    { label: 'Jan', value: 800 }, { label: 'Feb', value: 950 }, { label: 'Mar', value: 1100 },
+                    { label: 'Apr', value: 900 }, { label: 'Mei', value: 1200 }, { label: 'Jun', value: totalUnits }
+                ];
+
+                kpiMetricsHtml += `
+                    ${renderKPICard('Total Unit Produksi', totalUnits, 'Total unit yang diproduksi.', 'fas fa-factory', '', 1500)}
+                    ${renderKPICard('Produksi Selesai', completedProductions, 'Jumlah proses produksi yang telah selesai.', 'fas fa-check-circle', '', processedData.length)}
+                    ${renderKPICard('Dalam Proses', inProgressProductions, 'Jumlah proses produksi yang sedang berjalan.', 'fas fa-spinner', 'orange', processedData.length)}
+                `;
+                chartHtml += renderLineChart(productionTrend, 'Tren Produksi Bulanan (Unit)');
+
+            } else if (sourceKey === 'penjualan_get') {
+                const totalRevenue = processedData.reduce((sum, item) => sum + (parseFloat(item.total_harga) || 0), 0);
+                const totalOrders = processedData.length;
+                const completedOrders = processedData.filter(item => item.status_pesanan === 'Selesai').length;
+                const pendingOrders = processedData.filter(item => item.status_pesanan !== 'Selesai').length;
+
+                const salesTrend = [
+                    { label: 'Jan', value: 20000000 }, { label: 'Feb', value: 25000000 }, { label: 'Mar', value: 30000000 },
+                    { label: 'Apr', value: 22000000 }, { label: 'Mei', value: 35000000 }, { label: 'Jun', value: totalRevenue }
+                ];
+
+                kpiMetricsHtml += `
+                    ${renderKPICard('Total Pendapatan', `Rp ${totalRevenue.toLocaleString('id-ID')}`, 'Total penjualan bersih.', 'fas fa-money-bill-wave', '', 50000000)}
+                    ${renderKPICard('Pesanan Selesai', completedOrders, 'Jumlah pesanan yang sudah dibayar dan diproses.', 'fas fa-shopping-cart', '', totalOrders)}
+                    ${renderKPICard('Pesanan Tertunda', pendingOrders, 'Jumlah pesanan yang belum selesai.', 'fas fa-hourglass-half', 'orange', totalOrders)}
+                `;
+                chartHtml += renderLineChart(salesTrend, 'Tren Penjualan Bulanan (Rp)');
+
+            } else if (sourceKey === 'pengiriman_get') {
+                const totalDeliveries = processedData.length;
+                const deliveredSuccess = processedData.filter(item => item.status_pengiriman === 'Terkirim').length;
+                const deliveredFailed = processedData.filter(item => item.status_pengiriman === 'Gagal').length;
+                const avgDeliveryTime = calculateAvgDeliveryTime(processedData);
+
+                const deliveryTrend = [
+                    { label: 'Jan', value: 90 }, { label: 'Feb', value: 92 }, { label: 'Mar', value: 88 },
+                    { label: 'Apr', value: 95 }, { label: 'Mei', value: 91 }, { label: 'Jun', value: (deliveredSuccess / totalDeliveries * 100) || 0 }
+                ];
+
+                kpiMetricsHtml += `
+                    ${renderKPICard('Pengiriman Berhasil', deliveredSuccess, 'Jumlah pengiriman yang sukses.', 'fas fa-truck', '', totalDeliveries)}
+                    ${renderKPICard('Pengiriman Gagal', deliveredFailed, 'Jumlah pengiriman yang gagal atau dikembalikan.', 'fas fa-exclamation-triangle', 'red', totalDeliveries)}
+                    ${renderKPICard('Rata-rata Waktu Kirim', `${avgDeliveryTime} hari`, 'Estimasi rata-rata waktu pengiriman.', 'fas fa-clock', '', 7)}
+                `;
+                chartHtml += renderLineChart(deliveryTrend, 'Persentase Pengiriman Berhasil (%)');
+            } else {
+                kpiMetricsHtml = `<div class="loading-display"><p>Tidak ada laporan KPI yang cocok untuk ${displayTitle}.</p></div>`;
+                hasData = false;
+            }
+
+            kpiMetricsHtml += '</div>'; // Close kpi-metrics-grid
+            outputElement.innerHTML = `${kpiMetricsHtml}${chartHtml}`;
+
+            if (!hasData) {
+                outputElement.innerHTML = `<div class="loading-display"><p>Tidak ada data untuk menampilkan laporan ${displayTitle}.</p></div>`;
+            }
+        }
+
+
+        // Helper to render a KPI card
+        const renderKPICard = (title, value, description, iconClass, colorClass = '', maxValue = 1) => {
+            let percentage = 0;
+            if (typeof value === 'number' && maxValue > 0) {
+                percentage = (value / maxValue) * 100;
+            } else if (typeof value === 'string' && value.includes('Rp') && maxValue > 0) {
+                 // For currency, extract number and calculate
+                const numValue = parseFloat(value.replace(/[^0-9,-]+/g,"").replace(",", "."));
+                if (!isNaN(numValue)) {
+                    percentage = (numValue / maxValue) * 100;
+                }
+            }
+            percentage = Math.min(100, Math.max(0, percentage)); // Cap between 0 and 100
+
+            return `
+                <div class="kpi-card">
+                    <h4>${title}</h4>
+                    <div class="kpi-value">
+                        <i class="${iconClass}"></i>
+                        <span>${value}</span>
+                    </div>
+                    <p class="kpi-description">${description}</p>
+                    <div class="kpi-graph">
+                        <div class="kpi-bar ${colorClass}" style="width: ${percentage}%;"></div>
+                    </div>
+                </div>
+            `;
+        };
+
+        // Helper to render a simple line chart (as bar chart for simplicity here)
+        const renderLineChart = (data, title) => {
+            if (!data || data.length === 0) {
+                return '<p style="text-align: center; color: #6b7280; margin-top: 1rem;">Tidak ada data untuk grafik.</p>';
+            }
+
+            const maxVal = Math.max(...data.map(d => d.value));
+            const chartBars = data.map(point => {
+                const height = maxVal > 0 ? (point.value / maxVal) * 100 : 0;
+                return `
+                    <div class="line-chart-bar" style="height: ${height}%;">
+                        <span>${point.value.toLocaleString('id-ID')}</span>
+                        <div class="line-chart-label">${point.label}</div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div style="margin-top: 2rem;">
+                    <h4>${title}</h4>
+                    <div class="kpi-line-chart">
+                        ${chartBars}
+                    </div>
+                </div>
+            `;
+        };
+
+        // Dummy function to calculate average delivery time (replace with actual logic if dates are available)
+        function calculateAvgDeliveryTime(deliveryData) {
+            // For demonstration, assume 3 days avg, or calculate if data has start/end dates
+            if (deliveryData && deliveryData.length > 0) {
+                // Example: if data had 'order_date' and 'delivery_date'
+                // let totalDays = 0;
+                // let deliveredCount = 0;
+                // deliveryData.forEach(item => {
+                //     if (item.order_date && item.delivery_date) {
+                //         const orderDate = new Date(item.order_date);
+                //         const deliveryDate = new Date(item.delivery_date);
+                //         const diffTime = Math.abs(deliveryDate - orderDate);
+                //         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                //         totalDays += diffDays;
+                //         deliveredCount++;
+                //     }
+                // });
+                // return deliveredCount > 0 ? (totalDays / deliveredCount).toFixed(1) : 'N/A';
+                return 3.5; // Placeholder
+            }
+            return 'N/A';
         }
 
 
@@ -1608,8 +2028,18 @@
 
             const thead = table.createTHead();
             const headerRow = thead.insertRow();
-            const allKeys = [...new Set(dataArray.flatMap(obj => Object.keys(obj)))];
-            allKeys.forEach(key => {
+            // Define desired order and display names for user management table
+            const userTableKeys = ['id_user', 'username', 'role', 'created_at'];
+            const allKeys = [...new Set(dataArray.flatMap(obj => Object.keys(obj)))]; // Fallback for other modules
+
+            let displayKeys;
+            if (outputElement.id === 'user-data-output') {
+                displayKeys = userTableKeys;
+            } else {
+                displayKeys = allKeys;
+            }
+            
+            displayKeys.forEach(key => {
                 const th = document.createElement('th');
                 th.textContent = formatHeader(key);
                 headerRow.appendChild(th);
@@ -1618,9 +2048,42 @@
             const tbody = table.createTBody();
             dataArray.forEach(item => {
                 const row = tbody.insertRow();
-                allKeys.forEach(key => {
+                displayKeys.forEach(key => {
                     const cell = row.insertCell();
-                    cell.textContent = item[key] !== undefined && item[key] !== null ? item[key] : '-';
+                    // Custom display for known JSON/array fields
+                    if (key === 'bahan_terpakai' || key === 'produk_dikirim' || key === 'produk_dibeli') {
+                        try {
+                            const parsed = JSON.parse(item[key]);
+                            if (Array.isArray(parsed)) {
+                                cell.innerHTML = `<ul>${parsed.map(i => `<li>${i.nama_item || i.nama || 'Item'} (${i.jumlah || i.qty || '-'})</li>`).join('')}</ul>`;
+                            } else if (typeof parsed === 'object' && parsed !== null) {
+                                // For single JSON objects like {nama: "...", jumlah: "..."}, try to format as list item
+                                const parts = [];
+                                if (parsed.nama_item) parts.push(parsed.nama_item);
+                                else if (parsed.nama) parts.push(parsed.nama);
+                                if (parsed.jumlah) parts.push(`(${parsed.jumlah})`);
+                                else if (parsed.qty) parts.push(`(${parsed.qty})`);
+                                
+                                if (parts.length > 0) {
+                                    cell.textContent = parts.join(' ');
+                                } else {
+                                    cell.textContent = JSON.stringify(parsed);
+                                }
+                            } else {
+                                cell.textContent = item[key] !== undefined && item[key] !== null ? item[key] : '-';
+                            }
+                        } catch (e) {
+                            cell.textContent = item[key] !== undefined && item[key] !== null ? item[key] : '-';
+                        }
+                    } else if (key === 'password') {
+                        cell.textContent = '********'; // Hide passwords
+                    } 
+                    else if (key === 'id_user' && item.user_id) { // Handle potential user_id instead of id_user
+                        cell.textContent = item.user_id;
+                    }
+                    else {
+                        cell.textContent = item[key] !== undefined && item[key] !== null ? item[key] : '-';
+                    }
                 });
             });
 
@@ -1629,6 +2092,10 @@
         }
 
         function formatHeader(key) {
+            // Specific formatting for user management keys
+            if (key === 'id_user') return 'ID User';
+            if (key === 'created_at') return 'Created At';
+
             return key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
         }
 
@@ -1640,23 +2107,177 @@
                     <p><strong>Module:</strong> ${MODULE_TITLES[currentModuleKey] || 'Tidak diketahui'}</p>
                     <p><strong>Time:</strong> ${new Date().toLocaleString('id-ID')}</p>
                     <hr style="margin: 1rem 0; border: none; height: 1px; background: rgba(239, 68, 68, 0.3);">
-                    <p><small>Pastikan server modul sedang berjalan dan dapat diakses.</small></p>
+                    <p><small>Pastikan server modul sedang berjalan dan dapat diakses, serta responsnya adalah JSON yang valid.</small></p>
                 </div>
             `;
         }
 
         function refreshCurrentData() {
-            if (currentModuleKey) {
-                // For KPI, we need to know which KPI sub-report was last viewed.
-                // This simplified version will default to 'kpi_produksi' for KPI refresh.
-                // For a more robust solution, you'd need a state variable to track the active KPI type.
-                if (currentModuleKey === 'kpi') {
-                    loadDetailData('kpi_produksi', 'kpi'); // Default KPI refresh
-                } else {
-                    loadDetailData(`${currentModuleKey}_get`, currentModuleKey);
-                }
+            if (currentModuleKey === 'kpi') {
+                // For KPI, always refresh the currently displayed KPI or the overall summary if none was selected
+                processAndDisplayKPI(currentKpiSourceKey || 'all_kpis', MODULE_TITLES[currentKpiSourceKey] || 'Ringkasan KPI');
+            } else if (currentModuleKey) {
+                // For other modules, use their regular get endpoint
+                loadDetailData(`${currentModuleKey}_get`, currentModuleKey);
             } else {
                 showErrorMessage('Tidak ada modul yang dipilih untuk di-refresh.');
+            }
+        }
+
+        async function handleAction(actionKey, moduleKey) {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                showErrorMessage('Anda harus login untuk melakukan tindakan ini.');
+                logout();
+                return;
+            }
+
+            const url = API_URLS[actionKey];
+            if (!url) {
+                showErrorMessage(`Aksi API tidak didefinisikan untuk: ${actionKey}`);
+                return;
+            }
+
+            let method = 'POST';
+            let bodyData = {};
+            let itemId = null;
+            const userRole = localStorage.getItem('userRole');
+
+            // Permission check for User Management actions
+            if (moduleKey === 'user' && userRole !== 'admin') {
+                showErrorMessage('Anda tidak memiliki izin untuk mengelola pengguna.');
+                return;
+            }
+
+            switch (actionKey) {
+                case 'user_add':
+                    const newUsername = prompt('Masukkan Nama Pengguna baru:');
+                    if (!newUsername) { showErrorMessage('Nama Pengguna tidak boleh kosong.'); return; }
+                    const newPassword = prompt('Masukkan Kata Sandi untuk pengguna baru:');
+                    if (!newPassword) { showErrorMessage('Kata Sandi tidak boleh kosong.'); return; }
+                    const newRole = prompt('Masukkan Role (admin, operator, viewer) untuk pengguna baru:');
+                    if (!newRole || !['admin', 'operator', 'viewer'].includes(newRole.toLowerCase())) { 
+                        showErrorMessage('Role tidak valid. Harus admin, operator, atau viewer.'); return; 
+                    }
+                    bodyData = { username: newUsername, password: newPassword, role: newRole };
+                    method = 'POST';
+                    break;
+                case 'user_update':
+                    itemId = prompt('Masukkan ID Pengguna yang akan di-update:');
+                    if (!itemId) { showErrorMessage('ID Pengguna tidak boleh kosong.'); return; }
+                    const currentData = (await (await fetch(API_URLS.user_get)).json()).find(u => (u.id_user || u.id) == itemId);
+                    if (!currentData) { showErrorMessage('Pengguna dengan ID tersebut tidak ditemukan.'); return; }
+
+                    const updatedUsername = prompt(`Masukkan Nama Pengguna baru (saat ini: ${currentData.username || '-'}, kosongkan jika tidak diubah):`);
+                    const updatedPassword = prompt('Masukkan Kata Sandi baru (kosongkan jika tidak diubah):');
+                    const updatedRole = prompt(`Masukkan Role baru (saat ini: ${currentData.role || '-'}, kosongkan jika tidak diubah):`);
+                    
+                    bodyData = { id: itemId };
+                    if (updatedUsername) bodyData.username = updatedUsername;
+                    if (updatedPassword) bodyData.password = updatedPassword;
+                    if (updatedRole && ['admin', 'operator', 'viewer'].includes(updatedRole.toLowerCase())) bodyData.role = updatedRole;
+                    else if (updatedRole) { showErrorMessage('Role tidak valid. Harus admin, operator, atau viewer.'); return; }
+
+                    if (Object.keys(bodyData).length === 1 && bodyData.id) {
+                        showErrorMessage('Tidak ada data yang diubah. Aksi dibatalkan.');
+                        return;
+                    }
+                    method = 'PUT'; // Assuming PUT for update
+                    break;
+                case 'user_delete':
+                    itemId = prompt('Masukkan ID Pengguna yang akan dihapus:');
+                    if (!itemId) { showErrorMessage('ID Pengguna tidak boleh kosong.'); return; }
+                    if (!confirm(`Anda yakin ingin menghapus pengguna dengan ID ${itemId}?`)) {
+                        showErrorMessage('Aksi hapus dibatalkan.');
+                        return;
+                    }
+                    bodyData = { id: itemId };
+                    method = 'DELETE';
+                    break;
+                case 'rencana_update':
+                    itemId = prompt('Masukkan ID Rencana Produksi yang akan di-update:');
+                    if (!itemId) { showErrorMessage('ID tidak boleh kosong.'); return; }
+                    const newPlan = prompt('Masukkan data update (JSON, e.g., {"field":"value"}):');
+                    try {
+                        bodyData = { ...JSON.parse(newPlan), id: itemId };
+                    } catch (e) {
+                        showErrorMessage('Format JSON tidak valid.');
+                        return;
+                    }
+                    method = 'PUT';
+                    break;
+                case 'produksi_status':
+                case 'pengiriman_status':
+                case 'penjualan_status':
+                    itemId = prompt(`Masukkan ID untuk ${MODULE_TITLES[moduleKey]} yang akan diubah statusnya:`);
+                    if (!itemId) { showErrorMessage('ID tidak boleh kosong.'); return; }
+                    const newStatus = prompt(`Masukkan status baru untuk ID ${itemId}:`);
+                    if (!newStatus) { showErrorMessage('Status tidak boleh kosong.'); return; }
+                    bodyData = { id: itemId, status: newStatus };
+                    method = 'PUT'; // Or PATCH depending on API design
+                    break;
+                case 'bahanbaku_kurangi':
+                case 'produkjadi_keluar':
+                    itemId = prompt(`Masukkan ID untuk ${MODULE_TITLES[moduleKey]} yang stoknya akan dikurangi:`);
+                    if (!itemId) { showErrorMessage('ID tidak boleh kosong.'); return; }
+                    const quantity = prompt(`Masukkan jumlah yang akan dikurangi/dikeluarkan untuk ID ${itemId}:`);
+                    if (!quantity || isNaN(quantity) || parseInt(quantity) <= 0) {
+                        showErrorMessage('Jumlah harus angka positif.');
+                        return;
+                    }
+                    bodyData = { id: itemId, quantity: parseInt(quantity) };
+                    method = 'POST'; // Or PUT/PATCH
+                    break;
+                case 'rencana_delete':
+                case 'produksi_delete':
+                case 'bahanbaku_delete':
+                case 'produkjadi_delete':
+                case 'pengiriman_delete':
+                case 'penjualan_delete':
+                    itemId = prompt(`Masukkan ID untuk ${MODULE_TITLES[moduleKey]} yang akan dihapus:`);
+                    if (!itemId) { showErrorMessage('ID tidak boleh kosong.'); return; }
+                    if (!confirm(`Anda yakin ingin menghapus item dengan ID ${itemId} dari ${MODULE_TITLES[moduleKey]}?`)) {
+                        showErrorMessage('Aksi hapus dibatalkan.');
+                        return;
+                    }
+                    bodyData = { id: itemId };
+                    method = 'DELETE';
+                    break;
+                default:
+                    showErrorMessage('Aksi tidak dikenal.');
+                    return;
+            }
+
+            showNotificationDebounced(`Melakukan aksi '${MODULE_TITLES[actionKey] || actionKey}'...`, 'loading');
+            updateSystemStatus('loading');
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: (method !== 'GET' && method !== 'DELETE') ? JSON.stringify(bodyData) : null,
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccessMessage(data.message || `${MODULE_TITLES[actionKey] || actionKey} berhasil.`);
+                    // Refresh data after successful action
+                    if (moduleKey === 'user') {
+                        loadDetailData('user_get', 'user');
+                    } else if (moduleKey === 'kpi') {
+                         // If it was a KPI action (shouldn't happen with current setup, but good for safety)
+                         processAndDisplayKPI(currentKpiSourceKey || 'all_kpis', MODULE_TITLES[currentKpiSourceKey] || 'Ringkasan KPI');
+                    }
+                    else {
+                        loadDetailData(`${moduleKey}_get`, moduleKey);
+                    }
+                } else {
+                    throw new Error(data.message || `API Error: HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showErrorMessage(`${MODULE_TITLES[actionKey] || actionKey} gagal: ${error.message}`);
+            } finally {
+                updateSystemStatus('online');
             }
         }
 
@@ -1744,6 +2365,9 @@
                 switch (event.key.toLowerCase()) {
                     case 'r':
                         refreshCurrentData();
+                        break;
+                    case 'u': // User Management
+                        navigateToDetail('user');
                         break;
                     case 'p':
                         navigateToDetail('rencana');
